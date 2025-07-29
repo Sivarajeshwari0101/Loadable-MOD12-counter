@@ -1,0 +1,52 @@
+module mod12_tb();
+	reg [3:0] data;
+	reg load,clk,rst;
+	wire [3:0] count;
+	 
+	mod12 dut(.data(data),.load(load),.clk(clk),.rst(rst),.count(count));
+	
+	initial
+	begin
+		clk=1'b1;
+		forever #5 clk=~clk;
+	end
+	
+	task initialise;
+	begin
+		rst=0;
+		load=0;
+		data=4'b0;
+	end
+	endtask
+	
+	task reset;
+	begin
+		@(negedge clk)
+			rst = 1'b1;
+		@(negedge clk)
+			rst = 1'b0;
+	end
+	endtask
+	
+	task inputs(input i,input [3:0] d);
+	begin
+		@(negedge clk)
+			data=d;
+			load=i;
+	end
+	endtask
+	
+	initial
+	begin
+		initialise;
+		reset;
+		inputs(0,4'd2);
+		#20;
+		inputs(1,4'd11);
+		inputs(0,4'd4);
+	    //#200;
+		inputs(1,4'd8);
+		inputs(0,4'd4);
+		#100 $finish;
+	end
+endmodule
